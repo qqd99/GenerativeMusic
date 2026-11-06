@@ -1,8 +1,8 @@
-import type {Clock,Config,TrackPlan,NoteEvent} from './composer';
-import {composeTrack,defaultConfig,validateConfig} from './composer';
-import {RotationScheduler,systemClock} from './scheduler';
-import {tunes} from './catalog';
-import type {Instrument,Style,Tune} from './types';
+import type {Clock,Config,TrackPlan,NoteEvent} from './composer.js';
+import {composeTrack,defaultConfig,validateConfig} from './composer.js';
+import {RotationScheduler,systemClock} from './scheduler.js';
+import {tunes} from './catalog.js';
+import type {Instrument,Style,Tune} from './types.js';
 
 type Voice={nodes:AudioNode[];sources:AudioScheduledSourceNode[];startedAt:number;stop:(at:number)=>void};
 export type MusicOptions={
