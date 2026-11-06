@@ -1,0 +1,11 @@
+{
+  "timezone": "Asia/Ho_Chi_Minh",
+  "seed": 24122026,
+  "lookAheadSec": 1.25,
+  "tickMs": 100,
+  "crossfadeSec": 4,
+  "maxVoices": 48,
+  "noRepeatWindow": 40,
+  "quietHours": { "start": 22, "end": 6 },
+  "levels": { "melody": 0.17, "bass": 0.08, "strings": 0.025, "bells": 0.08, "sleigh": 0.035 }
+}
