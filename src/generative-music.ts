@@ -2,6 +2,7 @@ import type {Clock,Config,TrackPlan,NoteEvent} from './composer.js';
 import {composeTrack,defaultConfig,validateConfig} from './composer.js';
 import {RotationScheduler,systemClock} from './scheduler.js';
 import {tunes} from './catalog.js';
+import {estimateTrackGainDb} from './mastering.js';
 import type {Instrument,Style,Tune} from './types.js';
 
 type Voice={nodes:AudioNode[];sources:AudioScheduledSourceNode[];startedAt:number;stop:(at:number)=>void};
@@ -67,7 +68,7 @@ export class GenerativeMusic {
   this.tickTimer=undefined;
   const nextGain=ctx.createGain(),old=this.currentGain;
   nextGain.gain.setValueAtTime(.0001,now);
-  nextGain.gain.linearRampToValueAtTime(1,now+Math.max(.05,fade));
+  const trackGainDb=estimateTrackGainDb(plan,this.config.targetLufs,this.config.maxTruePeakDbfs);\n  const linearGain=Math.pow(10,trackGainDb/20);\n  nextGain.gain.linearRampToValueAtTime(linearGain,now+Math.max(.05,fade));
   nextGain.connect(this.bus);
   this.currentGain=nextGain;
   if(old)this.fadeAndRetire(old,now,Math.max(.05,fade));
