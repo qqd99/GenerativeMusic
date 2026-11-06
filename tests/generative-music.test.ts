@@ -3,6 +3,7 @@ import {composeTrack,defaultConfig,validateConfig,virtualTrackIds} from '../src/
 import {tunes} from '../src/catalog';
 import {RotationScheduler} from '../src/scheduler';
 import type {Clock,Config,TrackPlan} from '../src/composer';
+import {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb} from '../src/mastering';
 
 class FakeClock implements Clock {
  time:number;private serial=0;private tasks=new Map<number,{at:number;fn:()=>void}>();
@@ -85,5 +86,20 @@ describe('Generative Music composer and scheduler',()=>{
   clock.advance((lullaby.duration+1)*1000);
   expect(played.length).toBeGreaterThan(1);expect(played[1].tune.id).not.toBe('silent-night');
   scheduler.stop();
+ });
+});
+
+describe('offline loudness and true-peak tools',()=>{
+ it('measures a finite K-weighted integrated loudness for a steady tone',()=>{
+  const fs=48000,data=new Float32Array(fs*2);
+  for(let i=0;i<data.length;i++)data[i]=.1*Math.sin(2*Math.PI*1000*i/fs);
+  expect(Number.isFinite(integratedLufs([data,data],fs))).toBe(true);
+ });
+ it('estimates true peak and respects the configured ceiling',()=>{
+  const data=new Float32Array(48000);
+  for(let i=0;i<data.length;i++)data[i]=.7*Math.sin(2*Math.PI*997*i/48000);
+  const gain=normalizationGainDb([data,data],48000,-22,-1);
+  const normalized=applyGainDb([data,data],gain);
+  expect(truePeakDbfs(normalized)).toBeLessThanOrEqual(-.9);
  });
 });
