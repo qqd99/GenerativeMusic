@@ -1,6 +1,6 @@
-import type {Clock,Config,TrackPlan} from './composer';
-import type {Tune,Style} from './types';
-import {composeTrack,defaultConfig,seeded,styles,validateConfig} from './composer';
+import type {Clock,Config,TrackPlan} from './composer.js';
+import type {Tune,Style} from './types.js';
+import {composeTrack,defaultConfig,seeded,styles,validateConfig} from './composer.js';
 
 export type SchedulerClock=Clock;
 export const systemClock:SchedulerClock={
