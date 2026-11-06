@@ -3,7 +3,7 @@ import {composeTrack,defaultConfig,validateConfig,virtualTrackIds} from '../src/
 import {tunes} from '../src/catalog';
 import {RotationScheduler} from '../src/scheduler';
 import type {Clock,Config,TrackPlan} from '../src/composer';
-import {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb} from '../src/mastering';
+import {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb,estimateTrackGainDb} from '../src/mastering';
 
 class FakeClock implements Clock {
  time:number;private serial=0;private tasks=new Map<number,{at:number;fn:()=>void}>();
@@ -102,4 +102,12 @@ describe('offline loudness and true-peak tools',()=>{
   const normalized=applyGainDb([data,data],gain);
   expect(truePeakDbfs(normalized)).toBeLessThanOrEqual(-.9);
  });
+});
+
+it('estimates a bounded live music gain before the app master bus',()=>{
+ const plan=composeTrack(tunes[0],'ballad',0,77,defaultConfig);
+ const gain=estimateTrackGainDb(plan,-22,-1);
+ expect(Number.isFinite(gain)).toBe(true);
+ expect(gain).toBeGreaterThanOrEqual(-18);
+ expect(gain).toBeLessThanOrEqual(9);
 });
