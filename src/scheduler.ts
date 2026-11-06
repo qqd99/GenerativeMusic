@@ -20,7 +20,7 @@ export class RotationScheduler {
  private token=0;
  private seed:number;
  private history:string[]=[];
- private active?:TrackPlan;
+ private active?:TrackPlan;\n private skipTuneId?:string;
  constructor(private options:RotationSchedulerOptions){
   this.config=validateConfig(options.config);
   this.clock=options.clock??systemClock;
@@ -37,7 +37,7 @@ export class RotationScheduler {
  }
  dedication(plan:TrackPlan){
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
-  this.running=true;this.token++;this.playAndSchedule(plan,()=>this.nextTrack());
+  this.running=true;this.token++;this.skipTuneId=plan.tune.id;this.history.push(plan.id);if(this.history.length>this.config.noRepeatWindow)this.history.shift();this.playAndSchedule(plan,()=>this.nextTrack());
  }
  private hour(){
   const date=new Date(this.clock.now());
@@ -58,7 +58,7 @@ export class RotationScheduler {
    this.timer=this.clock.setTimeout(()=>{if(this.running&&token===this.token)this.nextTrack();},15000);
    return;
   }
-  const random=seeded(this.seed++),choice=candidates[Math.floor(random()*candidates.length)];
+  this.skipTuneId=undefined;\n  const random=seeded(this.seed++),choice=candidates[Math.floor(random()*candidates.length)];
   this.history.push(choice.id);
   if(this.history.length>this.config.noRepeatWindow)this.history.shift();
   const plan=composeTrack(choice.t,choice.style,choice.key,this.seed++,this.config);
