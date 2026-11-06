@@ -1,4 +1,4 @@
-import type {Tune} from './types';
+import type {Tune} from './types.js';
 const t=(id:string,title:string,key:number,meter:3|4,source:string,sourceNote:string,melody:readonly (readonly [number,number,number][])[]):Tune=>({id,title,key,meter,source,sourceNote,melody});
 const art='https://jamescarterpiano.com/sheet-music/hymn-tune/';
 const pd='Artform score page labels this score public domain; melody transcription is preliminary and requires note-by-note review.';
