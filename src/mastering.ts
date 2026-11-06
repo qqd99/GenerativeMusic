@@ -10,7 +10,7 @@ function highShelf(fs:number):Coeff{
  const a0=(A+1)-(A-1)*c+beta,a1=2*((A-1)-(A+1)*c),a2=(A+1)-(A-1)*c-beta;
  return{b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:a1/a0,a2:a2/a0};
 }
-function filter(input:Float32Array,c:Coeff){
+function filter(input:ArrayLike<number>,c:Coeff){
  const out=new Float64Array(input.length);let x1=0,x2=0,y1=0,y2=0;
  for(let i=0;i<input.length;i++){const x=input[i],y=c.b0*x+c.b1*x1+c.b2*x2-c.a1*y1-c.a2*y2;out[i]=y;x2=x1;x1=x;y2=y1;y1=y;}
  return out;
