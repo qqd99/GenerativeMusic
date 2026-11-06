@@ -5,3 +5,7 @@ export type {Config,TrackPlan,Clock,NoteEvent} from './composer';
 export type {Style,Instrument,Tune,MelodyBar} from './types';
 
 export {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb,analyzeAndNormalize} from './mastering';
+
+export {renderTrackOffline} from './offline';
+export type {OfflineRenderOptions,OfflineRenderResult} from './offline';
+export type {LoudnessReport} from './mastering';
