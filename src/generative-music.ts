@@ -68,7 +68,9 @@ export class GenerativeMusic {
   this.tickTimer=undefined;
   const nextGain=ctx.createGain(),old=this.currentGain;
   nextGain.gain.setValueAtTime(.0001,now);
-  const trackGainDb=estimateTrackGainDb(plan,this.config.targetLufs,this.config.maxTruePeakDbfs);\n  const linearGain=Math.pow(10,trackGainDb/20);\n  nextGain.gain.linearRampToValueAtTime(linearGain,now+Math.max(.05,fade));
+  const trackGainDb=estimateTrackGainDb(plan,this.config.targetLufs,this.config.maxTruePeakDbfs);
+  const linearGain=Math.pow(10,trackGainDb/20);
+  nextGain.gain.linearRampToValueAtTime(linearGain,now+Math.max(.05,fade));
   nextGain.connect(this.bus);
   this.currentGain=nextGain;
   if(old)this.fadeAndRetire(old,now,Math.max(.05,fade));
