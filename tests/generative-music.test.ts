@@ -1,7 +1,89 @@
 import {describe,it,expect} from 'vitest';
-import {composeTrack,tunes,virtualTrackIds,defaultConfig} from '../src/index';
-describe('Generative Music composer',()=>{
- it('provides forty stable tune/style/key combinations',()=>{expect(new Set(virtualTrackIds()).size).toBe(40)});
- it('is deterministic for a fixed seed',()=>{const a=composeTrack(tunes[0],'swing',0,123,defaultConfig);const b=composeTrack(tunes[0],'swing',0,123,defaultConfig);expect(a.events).toEqual(b.events)});
- it('keeps generated notes inside the planned track',()=>{const p=composeTrack(tunes[1],'musicbox',10,7,defaultConfig);expect(p.events.length).toBeGreaterThan(100);expect(Math.max(...p.events.map(e=>e.at))).toBeLessThan(p.duration)});
+import {composeTrack,defaultConfig,validateConfig,virtualTrackIds} from '../src/composer';
+import {tunes} from '../src/catalog';
+import {RotationScheduler} from '../src/scheduler';
+import type {Clock,Config,TrackPlan} from '../src/composer';
+
+class FakeClock implements Clock {
+ time:number;private serial=0;private tasks=new Map<number,{at:number;fn:()=>void}>();
+ constructor(start:number){this.time=start;}
+ now(){return this.time;}
+ setTimeout(fn:()=>void,ms:number){const id=++this.serial;this.tasks.set(id,{at:this.time+Math.max(0,ms),fn});return id;}
+ clearTimeout(id:unknown){this.tasks.delete(id as number);}
+ advance(ms:number){
+  const target=this.time+ms;let count=0;
+  while(true){
+   let selected:number|undefined,task:{at:number;fn:()=>void}|undefined;
+   for(const [id,candidate] of this.tasks)if(candidate.at<=target&&(!task||candidate.at<task.at||(candidate.at===task.at&&id<(selected??Infinity)))){selected=id;task=candidate;}
+   if(!task||selected===undefined)break;
+   this.tasks.delete(selected);this.time=task.at;task.fn();
+   if(++count>20000)throw new Error('Fake clock runaway');
+  }
+  this.time=target;
+ }
+ get pending(){return this.tasks.size;}
+}
+const cfg=(seed=123):Config=>({...defaultConfig,seed,timezone:'UTC',quietHours:{start:22,end:6}});
+function run72(seed:number){
+ const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:string[]=[];
+ const scheduler=new RotationScheduler({catalog:tunes,config:cfg(seed),clock,onTrack:p=>played.push(p.id)});
+ scheduler.start();clock.advance(72*60*60*1000);
+ return {played,clock,scheduler};
+}
+describe('Generative Music composer and scheduler',()=>{
+ it('contains twelve distinct carols with score provenance records',()=>{
+  expect(tunes).toHaveLength(12);
+  expect(new Set(tunes.map(t=>t.id)).size).toBe(12);
+  for(const tune of tunes){expect(tune.source.startsWith('https://')).toBe(true);expect(tune.sourceNote.length).toBeGreaterThan(20);}
+ });
+ it('creates 240 distinct tune/style/key combinations',()=>{
+  const ids=virtualTrackIds(tunes);expect(ids).toHaveLength(240);expect(new Set(ids).size).toBe(240);
+ });
+ it('is deterministic for the same tune, configuration and seed',()=>{
+  const a=composeTrack(tunes[0],'swing',0,123,defaultConfig);
+  const b=composeTrack(tunes[0],'swing',0,123,defaultConfig);
+  expect(a).toEqual(b);
+ });
+ it('bounds generated note events to a finite musical plan',()=>{
+  const p=composeTrack(tunes[1],'musicbox',5,7,defaultConfig);
+  expect(p.events.length).toBeGreaterThan(100);
+  expect(p.events.every(e=>Number.isFinite(e.at)&&e.at>=0&&e.duration>0&&e.midi>=0&&e.midi<=127)).toBe(true);
+  expect(Math.max(...p.events.map(e=>e.at))).toBeLessThan(p.duration);
+ });
+ it('rejects unsafe scheduler and audio configuration values',()=>{
+  expect(()=>validateConfig({lookAheadSec:10})).toThrow();
+  expect(()=>validateConfig({maxVoices:1000})).toThrow();
+  expect(()=>validateConfig({tickMs:0})).toThrow();
+ });
+ it('simulates 72 hours without repeating any track inside the 40-track window',()=>{
+  const {played,scheduler}=run72(99);
+  expect(played.length).toBeGreaterThan(500);
+  for(let i=0;i+40<=played.length;i++)expect(new Set(played.slice(i,i+40)).size).toBe(40);
+  expect(new Set(scheduler.recentTrackIds).size).toBe(scheduler.recentTrackIds.length);
+ });
+ it('reproduces the same 72-hour event sequence for the same seed',()=>{
+  expect(run72(2026).played).toEqual(run72(2026).played);
+ });
+ it('restricts quiet-hour selections to ballad and musicbox styles',()=>{
+  const clock=new FakeClock(Date.UTC(2026,11,20,23)),styles:string[]=[];
+  const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>styles.push(p.style)});
+  scheduler.start();clock.advance(60*60*1000);
+  expect(styles.length).toBeGreaterThan(5);
+  expect(styles.every(s=>s==='ballad'||s==='musicbox')).toBe(true);
+ });
+ it('cancels pending rotation work on stop',()=>{
+  const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
+  const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>played.push(p)});
+  scheduler.start();const count=played.length;scheduler.stop();clock.advance(72*60*60*1000);
+  expect(played).toHaveLength(count);expect(clock.pending).toBe(0);
+ });
+ it('plays dedication first, then resumes normal repertoire rotation',()=>{
+  const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
+  const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>played.push(p)});
+  const lullaby=composeTrack(tunes.find(t=>t.id==='silent-night')!,'musicbox',5,77,defaultConfig);
+  scheduler.dedication(lullaby);expect(played[0].id).toBe(lullaby.id);
+  clock.advance((lullaby.duration+1)*1000);
+  expect(played.length).toBeGreaterThan(1);expect(played[1].tune.id).not.toBe('silent-night');
+  scheduler.stop();
+ });
 });
