@@ -51,7 +51,7 @@ export class RotationScheduler {
   const allowed:Style[]=quiet?['ballad','musicbox']:styles;
   const candidates=this.options.catalog.flatMap(t=>allowed.flatMap(style=>
    [0,2,5,7,9].map(offset=>({t,style,key:(t.key+offset)%12,id:t.id+'.'+style+'.'+((t.key+offset)%12)}))
-  )).filter(x=>!this.history.includes(x.id));
+  )).filter(x=>!this.history.includes(x.id)&&x.t.id!==this.skipTuneId);
   if(!candidates.length){
    this.options.onStatus?.('No-repeat window exhausted; waiting for the next selection window.');
    const token=++this.token;
