@@ -1,42 +1,106 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Generative Music</title>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10251f">
+<title>GenerativeMusic — Procedural Christmas Music</title>
 <style>
-:root{color-scheme:dark;font-family:system-ui;background:#0b1712;color:#f3f5e9}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#315747,#0b1712 75%);min-height:100vh}main{width:min(900px,calc(100% - 32px));margin:auto;padding:44px 0}h1{font-size:clamp(30px,5vw,46px);margin:0}p{color:#bdcfc3;line-height:1.6}.panel{background:#10231bdd;border:1px solid #426354;border-radius:18px;padding:22px;margin:16px 0}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}button,select,input{font:inherit;border-radius:9px;padding:10px 13px}button{border:1px solid #789b83;background:#254b39;color:white;font-weight:650;cursor:pointer}button.primary{background:#a8d6a0;color:#14251b}select,input{background:#09120f;color:#f3f4e9;border:1px solid #557763}.status{background:#09120f;border:1px solid #294438;border-radius:10px;padding:13px;min-height:44px;color:#d5e9d8}label{font-size:14px;color:#c5d8c9}.muted{font-size:13px;color:#9fb7a6}input[type=range]{accent-color:#a8d6a0;width:180px}a{color:#c5edb7}.pill{display:inline-block;border:1px solid #557763;border-radius:99px;padding:4px 9px;font-size:12px;margin-right:5px}
-</style></head><body><main>
-<h1>🎄 Generative Music</h1><p>Standalone procedural Christmas music laboratory. Native browser Web Audio synthesis, seeded composition and original arrangements. No AI music, external audio engine, downloaded audio or PixiJS integration.</p>
-<section class="panel"><div><span class="pill">Web Audio API</span><span class="pill">Procedural synthesis</span><span class="pill">Offline WAV</span></div><h2>Live playback</h2>
-<div class="row"><button class="primary" id="start">▶ Start rotation</button><button id="dedication">♫ Dedication — Silent Night</button><button id="stop">■ Stop</button></div>
-<div class="row"><label>Audition volume</label><input id="volume" type="range" min="0" max="1" step=".01" value=".7"></div><p class="status" id="status">Ready. Press Start. Audio begins only after a user gesture.</p></section>
-<section class="panel"><h2>Track laboratory</h2><div class="row"><label>Tune</label><select id="tune"><option value="jingle">Jingle Bells</option><option value="silent">Silent Night</option></select><label>Style</label><select id="style"><option>swing</option><option>ballad</option><option>musicbox</option><option>bellchoir</option></select><label>Key offset</label><select id="key"><option value="0">Original</option><option value="2">+2</option><option value="5">+5</option><option value="7">+7</option><option value="9">+9</option></select></div>
-<div class="row"><label>Seed</label><input id="seed" type="number" value="24122026"><button id="render">Render complete WAV</button></div><p class="status" id="render-status">Choose a tune and render a full composition with OfflineAudioContext.</p>
-<p class="muted">2 encoded tune cards × 4 styles × 5 keys = 40 virtual combinations. This does not meet the separate requirement for 12 score-verified carols.</p></section>
-<section class="panel"><h2>Score provenance</h2><p>Jingle Bells — James Lord Pierpont (1857), <a href="https://cantorion.org/music/4731/Jingle-Bells-First-edition" target="_blank" rel="noreferrer">first-edition score reference</a>. Melody still requires note-by-note audit.</p><p>Silent Night — Franz Xaver Gruber (1818), <a href="https://imslp.org/wiki/Stille_Nacht,_heilige_Nacht,_H.145_(Gruber,_Franz_Xaver)" target="_blank" rel="noreferrer">IMSLP public-domain score entry</a>. Melody still requires note-by-note audit.</p><p class="muted">No modern copyrighted Christmas songs, recordings, samples or third-party audio packs. The two transcriptions are preliminary, not production-verified.</p></section>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#091611;color:#f2f5e9}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#315747,#10251d 55%,#08120e)}
+main{width:min(960px,calc(100% - 32px));margin:auto;padding:42px 0 70px}
+h1{font-size:clamp(32px,5vw,48px);letter-spacing:-.045em;margin:0 0 8px}h2{font-size:20px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}
+p{color:#bdcfc3;line-height:1.6}.lead{max-width:760px}.panel{background:#10231bdd;border:1px solid #426354;border-radius:18px;padding:22px;margin:16px 0}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}
+button,select,input{font:inherit;border-radius:9px;padding:10px 13px}
+button{border:1px solid #789b83;background:#254b39;color:#fff;font-weight:650;cursor:pointer}
+button.primary{background:#a8d6a0;color:#14251b;border-color:#a8d6a0}button:disabled{opacity:.45;cursor:not-allowed}
+select,input{background:#09120f;color:#f3f4e9;border:1px solid #557763}
+label{font-size:13px;color:#c5d8c9;display:flex;gap:7px;align-items:center}
+input[type=range]{accent-color:#a8d6a0;width:170px;padding:0}
+.status{background:#09120f;border:1px solid #294438;border-radius:10px;padding:13px;min-height:46px;color:#d5e9d8;line-height:1.5}
+.muted{font-size:13px;color:#9fb7a6}.pill{display:inline-block;border:1px solid #557763;border-radius:99px;padding:4px 9px;font-size:12px;color:#cde8d1;margin:0 5px 6px 0}
+a{color:#c5edb7}.catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-top:14px}
+.song{border:1px solid #294438;border-radius:10px;padding:11px;background:#0a1812}.song strong{display:block;font-size:14px}.song small{color:#9fb7a6;line-height:1.4}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1}
+.field select,.field input{width:100%}
+.note{border-left:3px solid #789b83;padding-left:12px}
+@media(max-width:520px){main{padding-top:28px}.panel{padding:17px}.row button{flex:1}}
+</style>
+</head>
+<body><main>
+<h1>🎄 GenerativeMusic</h1>
+<p class="lead">A standalone procedural Christmas music laboratory. Original arrangements, seeded composition and browser-native Web Audio synthesis — no AI music, external audio engine, recordings or downloaded sample packs.</p>
+<div><span class="pill">12 carol transcriptions</span><span class="pill">4 arrangement styles</span><span class="pill">5 key offsets</span><span class="pill">Offline WAV export</span></div>
+<section class="panel">
+ <h2>Live rotation</h2>
+ <p class="muted">Rotation selects a tune, arrangement and key. Quiet hours are 22:00–06:00 in the configured Asia/Ho_Chi_Minh timezone; quiet styles are ballad and musicbox.</p>
+ <div class="row"><button class="primary" id="start">▶ Start rotation</button><button id="dedication">♫ Dedication — Silent Night</button><button id="stop">■ Stop</button></div>
+ <div class="row"><label>App master volume <input id="volume" type="range" min="0" max="1" step=".01" value=".7"></label><span class="muted">The demo owns this master gain. The reusable module does not.</span></div>
+ <p class="status" id="status" role="status" aria-live="polite">Ready. Press Start rotation; playback begins only after a user gesture.</p>
+</section>
+<section class="panel">
+ <h2>Track laboratory</h2>
+ <div class="grid">
+  <div class="field"><label for="tune">Carols</label><select id="tune"></select></div>
+  <div class="field"><label for="style">Arrangement</label><select id="style"><option value="swing">Festive swing</option><option value="ballad">Gentle ballad</option><option value="musicbox">Music box lullaby</option><option value="bellchoir">Winter bell choir</option></select></div>
+  <div class="field"><label for="key">Transposition</label><select id="key"><option value="0">Original key</option><option value="2">+2 semitones</option><option value="5">+5 semitones</option><option value="7">+7 semitones</option><option value="9">+9 semitones</option></select></div>
+  <div class="field"><label for="seed">Composition seed</label><input id="seed" type="number" value="24122026" step="1"></div>
+ </div>
+ <div class="row"><button id="play-selected">♫ Play selected track</button><button class="primary" id="render">Render normalized WAV</button></div>
+ <p class="status" id="render-status" role="status">Choose a carol, style and seed to audition or render a complete WAV.</p>
+ <p class="muted">WAV mastering uses K-weighted integrated-loudness estimation toward −22 LUFS and a 4× cubic-interpolation true-peak estimate capped at −1 dBTP. These are engineering estimates, not an independent EBU R128 certification.</p>
+ <div class="note muted" id="source-note">Score provenance will appear here.</div>
+</section>
+<section class="panel">
+ <h2>Repertoire</h2>
+ <p class="muted">Each entry links to a public-domain score reference. The encoded melodies are preliminary hand transcriptions; note-by-note score review remains a release gate. Only original procedural arrangements are generated here.</p>
+ <div class="catalog" id="catalog"></div>
+</section>
+<section class="panel">
+ <h2>About the engine</h2>
+ <p>Composition and scheduling are pure deterministic TypeScript modules. Playback accepts a host-supplied <code>BaseAudioContext</code> and output <code>AudioNode</code>. The app owns the audio context, master volume, mute and speech ducking. The music engine owns arrangement, voice synthesis, crossfades and repertoire rotation.</p>
+ <p class="muted">No downloaded samples are used. The synthesizer uses oscillators, envelopes, filters, stereo panning and deterministic generated noise for sleigh-bell texture. Decoded sample cache: 0 MB.</p>
+</section>
 </main>
-<script>
-(()=>{
-const tunes={
-jingle:{title:'Jingle Bells',key:0,meter:4,notes:[[[0,64,1],[1,64,1],[2,64,2]],[[0,64,1],[1,64,1],[2,64,2]],[[0,64,1],[1,67,1],[2,60,1.5],[3.5,62,.5]],[[0,64,4]],[[0,65,1],[1,65,1],[2,65,1.5],[3.5,65,.5]],[[0,65,1],[1,64,1],[2,64,1],[3,64,.5],[3.5,64,.5]],[[0,64,1],[1,62,1],[2,62,1],[3,64,1]],[[0,62,2],[2,67,2]],[[0,64,1],[1,64,1],[2,64,2]],[[0,64,1],[1,64,1],[2,64,2]],[[0,64,1],[1,67,1],[2,60,1.5],[3.5,62,.5]],[[0,64,4]],[[0,65,1],[1,65,1],[2,65,1.5],[3.5,65,.5]],[[0,65,1],[1,64,1],[2,64,1],[3,64,.5],[3.5,64,.5]],[[0,67,1],[1,67,1],[2,65,1],[3,62,1]],[[0,60,4]]]},
-silent:{title:'Silent Night',key:10,meter:3,notes:[[[0,65,1.5],[1.5,67,.5],[2,65,1]],[[0,62,2],[2,65,1]],[[0,67,1.5],[1.5,69,.5],[2,67,1]],[[0,65,2],[2,62,1]],[[0,72,1.5],[1.5,72,.5],[2,69,1]],[[0,70,2],[2,65,1]],[[0,67,1.5],[1.5,67,.5],[2,70,1]],[[0,69,1.5],[1.5,67,.5],[2,65,1]],[[0,67,1.5],[1.5,65,.5],[2,62,1]],[[0,67,1.5],[1.5,65,.5],[2,62,1]],[[0,72,1.5],[1.5,75,.5],[2,72,1]],[[0,70,2],[2,65,1]]]}
+<script type="module">
+import {GenerativeMusic,tunes,composeTrack,defaultConfig,renderTrackOffline} from './dist/index.js';
+const $=id=>document.getElementById(id),status=$('status'),renderStatus=$('render-status');
+let context=null,master=null,player=null;
+const styles=['Festive swing','Gentle ballad','Music box lullaby','Winter bell choir'];
+for(const tune of tunes){const option=document.createElement('option');option.value=tune.id;option.textContent=tune.title;$('tune').append(option);
+ const card=document.createElement('div');card.className='song';
+ const name=document.createElement('strong');name.textContent=tune.title;
+ const small=document.createElement('small');small.textContent=tune.sourceNote;
+ const link=document.createElement('a');link.href=tune.source;link.target='_blank';link.rel='noreferrer';link.textContent='Open score source';
+ card.append(name,small,document.createElement('br'),link);$('catalog').append(card);
+}
+function selectedPlan(){const tune=tunes.find(t=>t.id===$('tune').value),style=$('style').value,offset=Number($('key').value),seed=Number($('seed').value);
+ if(!tune)throw new Error('Select a carol');if(!Number.isInteger(seed))throw new Error('Seed must be a whole number');
+ return composeTrack(tune,style,(tune.key+offset)%12,seed,defaultConfig);
+}
+function ensurePlayer(){
+ if(!context){context=new AudioContext();master=context.createGain();master.gain.value=Number($('volume').value);master.connect(context.destination);
+  player=new GenerativeMusic({context,output:master,config:defaultConfig,onTrack:p=>{status.textContent='Playing '+p.title+' · '+p.style+' · '+p.bpm+' BPM · '+p.key+' key';},onStatus:m=>{status.textContent=m;}});
+ }
+ return player;
+}
+$('start').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.start();}catch(e){status.textContent='Unable to start: '+e.message;}};
+$('dedication').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.dedication();}catch(e){status.textContent='Unable to play dedication: '+e.message;}};
+$('stop').onclick=()=>{player?.stop();status.textContent='Stopped.';};
+$('volume').oninput=()=>{if(master&&context)master.gain.setTargetAtTime(Number($('volume').value),context.currentTime,.025);};
+$('play-selected').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.audition(selectedPlan());}catch(e){renderStatus.textContent='Unable to audition: '+e.message;}};
+$('render').onclick=async()=>{
+ let plan;try{plan=selectedPlan();}catch(e){renderStatus.textContent=e.message;return;}
+ const button=$('render');button.disabled=true;renderStatus.textContent='Rendering with OfflineAudioContext. Longer tracks may take a little time…';
+ try{
+  const result=await renderTrackOffline(plan,{sampleRate:44100,targetLufs:defaultConfig.targetLufs,maxTruePeakDbfs:defaultConfig.maxTruePeakDbfs});
+  const url=URL.createObjectURL(result.wav),a=document.createElement('a');a.href=url;a.download=plan.id+'-seed-'+plan.seed+'.wav';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+  const m=result.report;renderStatus.textContent='WAV ready · '+result.duration.toFixed(1)+' s · estimated loudness '+m.normalizedLufs.toFixed(1)+' LUFS · estimated true peak '+m.normalizedTruePeakDbfs.toFixed(1)+' dBTP · gain '+m.normalizationGainDb.toFixed(1)+' dB.';
+ }catch(e){renderStatus.textContent='WAV render failed: '+e.message;}finally{button.disabled=false;}
 };
-let ctx,master,rotation=null,playing=[],run=false,token=0,history=[];
-const el=id=>document.getElementById(id),status=el('status'),rs=el('render-status');
-const rand=seed=>{let x=seed>>>0;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296}};
-function context(){if(!ctx){ctx=new AudioContext();master=ctx.createGain();master.gain.value=Number(el('volume').value);master.connect(ctx.destination)}return ctx}
-function plan(id,style,key,seed){const t=tunes[id],r=rand(seed),range=style==='swing'?[112,140]:style==='ballad'?[66,76]:style==='musicbox'?[72,84]:[100,124],bpm=Math.round(range[0]+r()*(range[1]-range[0])),beat=60/bpm,events=[],trans=key-t.key;
-for(let bar=0;bar<96;bar++){const lift=bar>=80?2:0,root=48+t.key+[0,5,7,0,0,9,2,7][bar%8]+trans+lift;events.push({at:bar*t.meter*beat,d:2.6*beat,n:root-12,g:.12,i:'bass',p:-.08});
-for(const [v,p] of [[4,-.2],[7,.12],[11,.22]])events.push({at:bar*t.meter*beat,d:t.meter*.9*beat,n:root+v+12,g:.035,i:'strings',p});
-for(const [b,n,len] of t.notes[bar%t.notes.length]){const at=(bar*t.meter+b+(style==='swing'&&b%1===.5?.16:0))*beat,pitch=n+trans+lift;events.push({at,d:len*beat,n:pitch,g:.19,i:style==='musicbox'?'celesta':'piano',p:.02});if((bar%4===0&&b===0)||(style==='bellchoir'&&b%2===0)||(bar%4===3&&len>=1))events.push({at:at+.012,d:Math.min(.7,len)*beat,n:pitch+12,g:.09,i:'bell',p:.25})}
-const hits=style==='ballad'?[1,2]:style==='musicbox'?[]:[0,.5,1,1.5,2,2.5,3,3.5];for(const b of hits)if(b<t.meter)events.push({at:(bar*t.meter+b)*beat,d:.16,n:90,g:.055,i:'sleigh',p:r()*1.5-.75});if(bar%4===3)events.push({at:(bar*t.meter+t.meter-.5)*beat,d:2*beat,n:root+24,g:.08,i:'bell',p:0})}
-return{id:id+'.'+style+'.'+key,title:t.title,style,bpm,duration:96*t.meter*beat,events}}
-function voice(c,out,e,when,refs){const f=440*Math.pow(2,(e.n-69)/12),g=c.createGain(),p=c.createStereoPanner(),partials=e.i==='bell'?[1,.25,.1]:e.i==='strings'?[1,.3,.08]:e.i==='bass'?[1,.18,.05]:[1,.18,.05];partials.forEach((v,i)=>{const o=c.createOscillator(),a=c.createGain();o.type=e.i==='strings'?'sawtooth':'sine';o.frequency.value=f*(i===0?1:i===1?2.01:3.98);a.gain.value=v;o.connect(a);a.connect(g);o.start(when);o.stop(when+e.d+.1);refs.push(o)});if(e.i==='sleigh'){const n=c.createBufferSource(),b=c.createBuffer(1,Math.ceil(c.sampleRate*.12),c.sampleRate),d=b.getChannelData(0);let z=(Math.round(when*1000)^e.n^0x9e3779b9)>>>0;for(let i=0;i<d.length;i++){z=(Math.imul(z,1664525)+1013904223)>>>0;d[i]=z/2147483648-1;}n.buffer=b;const fl=c.createBiquadFilter();fl.type='highpass';fl.frequency.value=2500;n.connect(fl);fl.connect(g);n.start(when);n.stop(when+.12);refs.push(n)}const a=e.i==='strings'?.25:.01,rel=Math.min(.8,e.d*.25);g.gain.setValueAtTime(.0001,when);g.gain.linearRampToValueAtTime(e.g,when+a);g.gain.setValueAtTime(e.g,Math.max(when+a,when+e.d-rel));g.gain.linearRampToValueAtTime(.0001,when+e.d);p.pan.value=e.p;g.connect(p);p.connect(out);refs.push(g,p)}
-function play(p,done){const c=context(),start=c.currentTime+.15,own=++token,b=c.createGain(),refs=[];b.gain.setValueAtTime(.0001,start);b.gain.linearRampToValueAtTime(1,start+2);b.connect(master);p.events.forEach(e=>voice(c,b,e,start+e.at,refs));playing.push({b,refs});status.textContent='Playing '+p.title+' · '+p.style+' · '+p.bpm+' BPM';if(rotation)clearTimeout(rotation);rotation=setTimeout(()=>{if(own===token)done&&done()},Math.max(1000,(p.duration-2)*1000))}
-function next(){if(!run)return;const hour=new Date().getHours(),quiet=hour>=22||hour<6,styles=quiet?['ballad','musicbox']:['swing','ballad','musicbox','bellchoir'],pool=Object.keys(tunes).flatMap(id=>styles.flatMap(s=>[0,2,5,7,9].map(k=>({id,s,key:(tunes[id].key+k)%12,uid:id+'.'+s+'.'+((tunes[id].key+k)%12)})))).filter(x=>!history.includes(x.uid));if(!pool.length){status.textContent='No-repeat window exhausted: only 20 combinations are available during quiet hours; more verified tunes are needed.';return}const r=rand(Date.now()>>>0),x=pool[Math.floor(r()*pool.length)];history.push(x.uid);if(history.length>40)history.shift();play(plan(x.id,x.s,x.key,Date.now()>>>0),next)}
-function start(){if(run)return;run=true;next()}
-function stop(){run=false;token++;if(rotation)clearTimeout(rotation);rotation=null;if(ctx)for(const v of playing){try{v.b.gain.setTargetAtTime(.0001,ctx.currentTime,.025)}catch{}for(const n of v.refs){try{n.stop(ctx.currentTime+.15)}catch{}try{n.disconnect()}catch{}}try{v.b.disconnect()}catch{}}playing=[];status.textContent='Stopped.'}
-function dedication(){run=true;if(rotation)clearTimeout(rotation);play(plan('silent','musicbox',10,24122026),next)}
-el('start').onclick=()=>{const c=context();if(c.state==='suspended')c.resume();start()};el('stop').onclick=stop;el('dedication').onclick=()=>{const c=context();if(c.state==='suspended')c.resume();dedication()};el('volume').oninput=()=>{if(master)master.gain.setTargetAtTime(Number(el('volume').value),ctx.currentTime,.025)};
-function makeWav(buf){const ch=buf.numberOfChannels,n=buf.length,size=44+n*ch*2,ab=new ArrayBuffer(size),v=new DataView(ab),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,size-8,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,buf.sampleRate,true);v.setUint32(28,buf.sampleRate*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,size-44,true);let o=44;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){const x=Math.max(-1,Math.min(1,buf.getChannelData(c)[i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2}return new Blob([ab],{type:'audio/wav'})}
-el('render').onclick=async()=>{const id=el('tune').value,style=el('style').value,key=(tunes[id].key+Number(el('key').value))%12,seed=Number(el('seed').value);if(!Number.isInteger(seed)){rs.textContent='Seed must be an integer';return}rs.textContent='Rendering OfflineAudioContext…';try{const p=plan(id,style,key,seed),rate=44100,off=new OfflineAudioContext(2,Math.ceil((p.duration+3)*rate),rate),out=off.createGain(),refs=[];out.gain.value=.55;out.connect(off.destination);p.events.forEach(e=>voice(off,out,e,.05+e.at,refs));const buf=await off.startRendering(),blob=makeWav(buf),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=p.id+'-seed-'+seed+'.wav';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);let peak=0,sum=0,count=0;for(let c=0;c<2;c++)for(const x of buf.getChannelData(c)){peak=Math.max(peak,Math.abs(x));sum+=x*x;count++}rs.textContent='Rendered '+p.title+' · '+style+' · '+p.bpm+' BPM · '+buf.duration.toFixed(1)+' s · sample peak '+(20*Math.log10(Math.max(1e-9,peak))).toFixed(1)+' dBFS · RMS '+(10*Math.log10(Math.max(1e-12,sum/count))).toFixed(1)+' dBFS. RMS is not LUFS; this is not true-peak certification.'}catch(e){rs.textContent='Render failed: '+e.message}};
-window.addEventListener('pagehide',stop);
-})();
-</script></body></html>
+function updateSource(){const tune=tunes.find(t=>t.id===$('tune').value);$('source-note').replaceChildren();const text=document.createTextNode(tune.sourceNote+' '),link=document.createElement('a');link.href=tune.source;link.target='_blank';link.rel='noreferrer';link.textContent='View score source';$('source-note').append(text,link);}
+$('tune').onchange=updateSource;updateSource();
+window.addEventListener('pagehide',()=>player?.dispose());
+</script>
+</body></html>
