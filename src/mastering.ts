@@ -64,3 +64,22 @@ export function analyzeAndNormalize(channels:readonly Float32Array[],sampleRate:
  const normalized=applyGainDb(channels,gain);
  return{channels:normalized,report:{integratedLufs:integrated,truePeakDbfs:peak,normalizationGainDb:gain,normalizedLufs:integrated+gain,normalizedTruePeakDbfs:peak+gain}};
 }
+
+export function estimateTrackGainDb(plan:{duration:number;events:readonly {at:number;duration:number;midi:number;instrument:string;gain:number}[]},targetLufs=-22,maxTruePeakDbfs=-1):number{
+ let energy=0;const changes:{at:number;delta:number}[]=[];
+ for(const event of plan.events){
+  const squares=event.instrument==='sleigh'?1.24:1.035;
+  const absolute=event.instrument==='sleigh'?1.6:1.38;
+  energy+=event.gain*event.gain*squares*.5*event.duration;
+  const bound=event.gain*absolute;
+  changes.push({at:event.at,delta:bound},{at:event.at+event.duration,delta:-bound});
+ }
+ const meanPower=energy/Math.max(.001,plan.duration);
+ const estimatedLufs=-.691+10*Math.log10(Math.max(1e-15,meanPower))+1.2;
+ changes.sort((a,b)=>a.at-b.at||a.delta-b.delta);
+ let current=0,peak=0;
+ for(const change of changes){current+=change.delta;peak=Math.max(peak,current);}
+ const peakDb=20*Math.log10(Math.max(1e-12,peak));
+ const lufsGain=targetLufs-estimatedLufs,peakGain=maxTruePeakDbfs-peakDb;
+ return Math.max(-18,Math.min(9,lufsGain,peakGain));
+}
