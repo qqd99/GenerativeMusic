@@ -48,18 +48,18 @@ export class GenerativeMusic {
   const now=this.options.context.currentTime;
   for(const voice of this.voices)voice.stop(now);
   this.voices.clear();
-  if(this.currentGain){const g=this.currentGain;this.currentGain=undefined;this.fadeAndRetire(g,now,.12);}
   for(const timer of this.cleanupTimers)this.clock.clearTimeout(timer);
   this.cleanupTimers.clear();
   for(const gain of this.retiredGains){try{gain.disconnect();}catch{}}
   this.retiredGains.clear();
+  if(this.currentGain){const g=this.currentGain;this.currentGain=undefined;this.fadeAndRetire(g,now,.12);}
  }
  dedication(){
   const tune=tunes.find(t=>t.id==='silent-night')??tunes[0];
   const plan=composeTrack(tune,'musicbox',tune.key,this.config.seed+this.dedicationCount++,this.config);
-  this.running=true;
-  this.scheduler.dedication(plan);
+  this.audition(plan);
  }
+ audition(plan:TrackPlan){this.running=true;this.scheduler.dedication(plan);}
  private playPlan(plan:TrackPlan){
   if(!this.running)return;
   const ctx=this.options.context,now=ctx.currentTime,fade=this.config.crossfadeSec;
