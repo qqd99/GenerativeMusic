@@ -1,6 +1,6 @@
-import type {TrackPlan,NoteEvent} from './composer';
-import {analyzeAndNormalize,type LoudnessReport} from './mastering';
-import {seeded} from './composer';
+import type {TrackPlan,NoteEvent} from './composer.js';
+import {analyzeAndNormalize,type LoudnessReport} from './mastering.js';
+import {seeded} from './composer.js';
 export type OfflineRenderOptions={sampleRate?:number;targetLufs?:number;maxTruePeakDbfs?:number};
 export type OfflineRenderResult={wav:Blob;duration:number;sampleRate:number;report:LoudnessReport};
 function scheduleEvent(ctx:OfflineAudioContext,out:AudioNode,event:NoteEvent,when:number){
