@@ -1,4 +1,4 @@
-import type {Tune,Style,Instrument} from './types';
+import type {Tune,Style,Instrument} from './types.js';
 export type NoteEvent={at:number;duration:number;midi:number;instrument:Instrument;gain:number;pan:number;noiseSeed:number};
 export type Config={
  timezone:string;seed:number;lookAheadSec:number;tickMs:number;crossfadeSec:number;
