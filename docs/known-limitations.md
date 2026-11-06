@@ -19,8 +19,8 @@
 
 - **Score verification:** 12 score sources are recorded and their pages identify the scores as public domain, but the note-by-note transcription audit remains pending for every hand-entered melody. Do not mark the CR-03 “12 verified scores” requirement complete until reviewed and signed off.
 - **Legal scope:** public-domain claims depend on jurisdiction and exact score edition. The ledger records source-page statements, not legal advice or a worldwide legal opinion.
-- **Audio acceptance:** the mastering implementation is an EBU R128-style K-weighted estimate and a 4× cubic true-peak estimate, not an independent standards-certified meter. Human listening and reference-meter verification remain required.
-- **Target loudness:** export aims at −22 LUFS while limiting the estimated true peak to −1 dBTP. If the peak ceiling prevents reaching −22 LUFS, the true-peak ceiling takes priority and the report shows the resulting loudness.
+- **Audio acceptance:** offline export uses an EBU R128-style K-weighted integrated-loudness estimate and a 4× cubic true-peak estimate, not an independent standards-certified meter. Live playback uses a deterministic event-energy/peak-bound estimate for track gain, not a real-time standards-certified loudness meter. Human listening and reference-meter verification remain required.
+- **Target loudness:** offline export aims at −22 LUFS while limiting the estimated true peak to −1 dBTP. Live track gain is estimated toward the same target with a conservative peak bound. If the peak ceiling prevents reaching −22 LUFS, the peak ceiling takes priority.
 - **72-hour simulation:** this is a fast scheduler-only test. It does not play audio for 72 hours and does not validate browser throttling, device sleep or OS audio behavior.
 - **Operational soak:** owner listening sign-off, OBS CPU/GPU measurements, browser/device compatibility and a 24-hour real-time soak remain outstanding.
 - **WAV audition artifacts:** WAVs are generated on demand by the browser OfflineAudioContext renderer; the repository does not commit large generated binary WAVs.
