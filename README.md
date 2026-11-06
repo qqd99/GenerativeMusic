@@ -1,31 +1,52 @@
 # GenerativeMusic
 
-A standalone browser-based procedural Christmas music laboratory. This repository is independent of the PixiJS application. No AI music, external audio engine, downloaded audio or third-party sample pack is used.
+A standalone browser-based procedural Christmas music laboratory. Independent of the PixiJS application. No AI music, external audio engine, recordings, downloaded samples or third-party runtime audio software.
 
-## Try it online
+## Try the browser demo
 
-**GitHub Pages:** https://qqd99.github.io/GenerativeMusic/
+https://qqd99.github.io/GenerativeMusic/
 
-Open the page and press **Start rotation**, **Dedication — Silent Night**, or **Render complete WAV**. Audio playback starts only after a user gesture. The live player uses native Web Audio; the WAV renderer uses `OfflineAudioContext`.
+If GitHub Pages has not been enabled yet, open **Settings → Pages → Build and deployment → GitHub Actions**. The Pages workflow builds the TypeScript modules and deploys the repository root.
 
-GitHub Pages must be enabled with **Settings → Pages → Build and deployment → GitHub Actions**. The included workflow deploys the repository root after a push to `main`.
+## Features
+
+- Twelve Christmas carol melody records; four arrangement styles (swing, ballad, musicbox, bellchoir); five key offsets (240 virtual combinations).
+- Seeded composition and deterministic rotation selection.
+- Quiet-hour rotation (22:00–06:00, Asia/Ho_Chi_Minh by default).
+- Silent Night dedication followed by normal rotation.
+- Browser-native Web Audio synthesis; no third-party audio engine or downloaded sample packs.
+- OfflineAudioContext WAV export with K-weighted integrated-loudness estimation and 4× cubic true-peak estimation.
+- Pure 72-hour scheduler simulation and tests.
+- Standalone TypeScript module that accepts the host's BaseAudioContext and output AudioNode.
 
 ## Local development
 
-- Open `index.html` in a modern browser for the self-contained demo.
-- For the TypeScript module and tests, use Node.js 22+:
-  ```sh
-  npm install
-  npm run typecheck
-  npm test
-  ```
+Requires Node.js 22+.
 
-## Reusable TypeScript module
+```sh
+npm install
+npm run typecheck
+npm run build
+npm test
+```
 
-`src/generative-music.ts` exports `GenerativeMusic`. It accepts an existing `BaseAudioContext` and an output `AudioNode`; all music routes through that supplied output. It does not create or close an audio context, connect to `context.destination`, or manage autoplay. The host owns master volume, mute and speech ducking.
+Then serve the repository root over HTTP (for example `python -m http.server 8000`) and open `http://localhost:8000`. Build first so `dist/index.js` exists.
 
-## Current scope and honest limitations
+## Integration
 
-Two preliminary melody transcriptions are encoded: Jingle Bells and Silent Night. Four styles × five transposition offsets produce 40 virtual track IDs, not 40 distinct carols. The 12 score-verified carol target is not met; both melodies still need note-by-note audit against their cited public-domain score editions. Quiet hours expose only 20 virtual combinations, so the 40-track no-repeat target cannot be met with the current repertoire.
+See [docs/integration.md](docs/integration.md). The app owns AudioContext lifecycle, master volume, music mute, VieNeu speech, speech ducking, SFX and autoplay. The module only creates music voices and connects them to the supplied output node.
 
-No third-party recordings or samples are included. WAV audition output reports sample peak and RMS only; it does not certify integrated LUFS or true peak. A fast simulated 72-hour rotation test, owner listening sign-off, OBS performance measurement and 24-hour real-time soak remain outstanding. See `docs/known-limitations.md`.
+## Important verification note
+
+The catalog now has 12 distinct melodies and 12 public-domain score references. The cited source pages identify the score sources as public domain, but the hand-entered melody transcriptions still require note-by-note score comparison and human sign-off. This project does not claim that score-verification gate is complete. See [docs/tunes.md](docs/tunes.md) and [known limitations](docs/known-limitations.md).
+
+## Project structure
+
+- `index.html` — browser audition page.
+- `src/catalog.ts` — repertoire and score provenance.
+- `src/composer.ts` — pure seeded composer and config validation.
+- `src/scheduler.ts` — pure rotation scheduler with injectable clock.
+- `src/generative-music.ts` — Web Audio playback engine.
+- `src/offline.ts` — OfflineAudioContext WAV renderer.
+- `src/mastering.ts` — loudness and true-peak estimates.
+- `tests/` — composer, scheduler, 72-hour simulation and mastering tests.
