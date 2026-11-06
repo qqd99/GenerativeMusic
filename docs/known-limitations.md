@@ -1,10 +1,31 @@
-# Known limitations
+# Acceptance status and known limitations
 
-- Only two tune cards are encoded; the 12 verified carol acceptance target is unmet.
-- Both existing melody transcriptions still need note-by-note audit against their cited score editions.
-- Four styles × five keys × two tunes produce 40 virtual track IDs, not 40 independent repertoire melodies.
-- Quiet hours expose only ballad/musicbox styles (20 combinations), so a 40-track no-repeat window cannot be satisfied until more verified tunes are added. The selector reports exhaustion rather than silently repeating.
-- No owner-supplied licensed multisamples are present; procedural synthesis is used for all instruments.
-- Audition export reports sample peak and RMS. It does not yet measure integrated LUFS, phrase-gap bell-band share, spectral centroid or true peak.
-- The 72-hour test requirement still needs a dedicated fast simulated rotation test; it is not an audio playback test.
-- No owner listening sign-off, OBS CPU/GPU measurement or 24-hour real-time soak has been completed.
+## Implemented in this repository
+
+- Standalone browser demo; no PixiJS app files are modified.
+- TypeScript composition, rotation scheduler and Web Audio playback are separate modules.
+- Twelve distinct carol melody records, four styles and five transposition offsets (240 virtual combinations).
+- Seeded composer and seeded repertoire selection; injected clock for rotation and quiet-hour simulation.
+- A 72-hour simulated scheduler test checks the rolling 40-track no-repeat window without rendering or playing 72 hours of audio.
+- Quiet-hour rotation uses ballad/musicbox styles; configured timezone defaults to Asia/Ho_Chi_Minh.
+- Dedication plays Silent Night and then resumes normal rotation without immediately selecting Silent Night again.
+- Playback accepts a supplied BaseAudioContext and output AudioNode; app master volume, mute and speech ducking remain outside the module.
+- Look-ahead scheduling uses AudioContext.currentTime; active musical voices are capped; stop cancels rotation/tick timers and stops scheduled sources.
+- No decoded samples or third-party audio dependencies. A single small procedural noise buffer is reused by live playback.
+- OfflineAudioContext renderer exports PCM WAV and includes K-weighted integrated-loudness estimation plus 4× cubic-interpolation true-peak estimation and gain normalization.
+- CI runs TypeScript typecheck, build and unit tests.
+
+## Still not signed off
+
+- **Score verification:** 12 score sources are recorded and their pages identify the scores as public domain, but the note-by-note transcription audit remains pending for every hand-entered melody. Do not mark the CR-03 “12 verified scores” requirement complete until reviewed and signed off.
+- **Legal scope:** public-domain claims depend on jurisdiction and exact score edition. The ledger records source-page statements, not legal advice or a worldwide legal opinion.
+- **Audio acceptance:** the mastering implementation is an EBU R128-style K-weighted estimate and a 4× cubic true-peak estimate, not an independent standards-certified meter. Human listening and reference-meter verification remain required.
+- **Target loudness:** export aims at −22 LUFS while limiting the estimated true peak to −1 dBTP. If the peak ceiling prevents reaching −22 LUFS, the true-peak ceiling takes priority and the report shows the resulting loudness.
+- **72-hour simulation:** this is a fast scheduler-only test. It does not play audio for 72 hours and does not validate browser throttling, device sleep or OS audio behavior.
+- **Operational soak:** owner listening sign-off, OBS CPU/GPU measurements, browser/device compatibility and a 24-hour real-time soak remain outstanding.
+- **WAV audition artifacts:** WAVs are generated on demand by the browser OfflineAudioContext renderer; the repository does not commit large generated binary WAVs.
+
+## Dependencies
+
+Runtime: browser Web Audio API only (no external runtime dependency).
+Development: TypeScript 5.9 and Vitest 3.
