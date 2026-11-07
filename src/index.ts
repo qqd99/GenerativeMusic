@@ -9,3 +9,6 @@ export {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb,analyzeAndNo
 export {renderTrackOffline} from './offline.js';
 export type {OfflineRenderOptions,OfflineRenderResult} from './offline.js';
 export type {LoudnessReport} from './mastering.js';
+
+export {zipStore} from './zip.js';
+export type {ZipEntry} from './zip.js';
