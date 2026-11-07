@@ -12,7 +12,7 @@ This checklist maps only the requirements present in the supplied music brief. I
 | Separate composer, scheduler and playback | Implemented | `composer.ts`, `scheduler.ts`, `generative-music.ts` |
 | Deterministic seeded composition and injected clock | Implemented | Pure composer and clock-driven scheduler |
 | 72-hour fast scheduler simulation | Implemented | Fake-clock test; no audio playback |
-| OfflineAudioContext WAV audition | Implemented | `renderTrackOffline()`; browser exports WAV on demand |
+| OfflineAudioContext WAV audition | Implemented | `renderTrackOffline()`; browser exports a full track or a ZIP of 12 short ambient previews |
 | Bounded active voices and look-ahead | Implemented | Voice cap and configurable 1.25-second look-ahead default |
 | Sample cache below 150 MB | Implemented by omission | No decoded sample assets or sample cache; procedural noise only |
 | Smooth transitions and node cleanup | Implemented in engine | Crossfade, scheduled stop, onended cleanup; real device soak still needed |
