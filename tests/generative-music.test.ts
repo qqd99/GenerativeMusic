@@ -4,6 +4,7 @@ import {tunes} from '../src/catalog';
 import {RotationScheduler} from '../src/scheduler';
 import type {Clock,Config,TrackPlan} from '../src/composer';
 import {integratedLufs,truePeakDbfs,normalizationGainDb,applyGainDb,estimateTrackGainDb} from '../src/mastering';
+import {zipStore} from '../src/zip.js';
 
 class FakeClock implements Clock {
  time:number;private serial=0;private tasks=new Map<number,{at:number;fn:()=>void}>();
@@ -116,4 +117,14 @@ it('makes repeated start and stop calls safe',()=>{
  const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>played.push(p)});
  scheduler.start();scheduler.start();expect(played).toHaveLength(1);expect(clock.pending).toBe(1);
  scheduler.stop();scheduler.stop();expect(clock.pending).toBe(0);
+});
+
+it('creates a valid uncompressed ZIP for the audition WAV pack',async()=>{
+ const payload=new TextEncoder().encode('abc'),archive=zipStore([{name:'sample.wav',data:payload}]);
+ const bytes=new Uint8Array(await archive.arrayBuffer()),view=new DataView(bytes.buffer);
+ expect(archive.type).toBe('application/zip');
+ expect(view.getUint32(0,true)).toBe(0x04034b50);
+ expect(view.getUint32(14,true)).toBe(0x352441c2);
+ expect(view.getUint32(bytes.length-22,true)).toBe(0x06054b50);
+ expect(view.getUint16(bytes.length-12,true)).toBe(1);
 });
