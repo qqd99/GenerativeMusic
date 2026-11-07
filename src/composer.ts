@@ -1,4 +1,4 @@
-import type {Tune,Style,Instrument} from './types.js';
+import type {Tune,Style,Instrument,MusicMood} from './types.js';
 export type NoteEvent={at:number;duration:number;midi:number;instrument:Instrument;gain:number;pan:number;noiseSeed:number};
 export type Config={
  timezone:string;seed:number;lookAheadSec:number;tickMs:number;crossfadeSec:number;
@@ -63,4 +63,21 @@ export function composeTrack(tune:Tune,style:Style,key:number,seed:number,cfg:Co
  }
  events.sort((a,b)=>a.at-b.at||a.midi-b.midi);
  return{id:tune.id+'.'+style+'.'+key,tune,style,key,seed,bpm,duration:bars*tune.meter*beat,events};
+}
+
+/** Build a same-carol mood change. Keep the current tempo so the melody stays rhythmically aligned. */
+export function composeMoodTransition(current:TrackPlan,mood:MusicMood,bars=8,cfg:Config=defaultConfig):TrackPlan{
+ if(!Number.isInteger(bars)||bars<1||bars>32)throw new Error('transition bars must be an integer from 1 to 32');
+ const targetStyle:Style=mood==='calm'?'ambient':'swing';
+ const target=composeTrack(current.tune,targetStyle,current.key,(current.seed^0x5f3759df)>>>0,cfg);
+ const scale=target.bpm/current.bpm;
+ const events=target.events.map(event=>({...event,at:event.at*scale,duration:event.duration*scale}));
+ return{
+  ...target,
+  id:current.tune.id+'.'+mood+'.'+current.key,
+  bpm:current.bpm,
+  duration:current.duration,
+  events,
+  transitionSeconds:Math.min(current.duration,bars*current.tune.meter*60/current.bpm)
+ };
 }
