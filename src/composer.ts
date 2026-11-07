@@ -70,14 +70,24 @@ export function composeMoodTransition(current:TrackPlan,mood:MusicMood,bars=8,cf
  if(!Number.isInteger(bars)||bars<1||bars>32)throw new Error('transition bars must be an integer from 1 to 32');
  const targetStyle:Style=mood==='calm'?'ambient':'swing';
  const target=composeTrack(current.tune,targetStyle,current.key,(current.seed^0x5f3759df)>>>0,cfg);
- const scale=target.bpm/current.bpm;
- const events=target.events.map(event=>({...event,at:event.at*scale,duration:event.duration*scale}));
+ const rampBeats=bars*current.tune.meter,startBpm=current.bpm,endBpm=target.bpm,delta=endBpm-startBpm;
+ const secondsAtBeat=(beat:number)=>{
+  if(Math.abs(delta)<.001)return beat*60/startBpm;
+  if(beat<=rampBeats)return 60*rampBeats/delta*Math.log((startBpm+delta*beat/rampBeats)/startBpm);
+  const rampSeconds=60*rampBeats/delta*Math.log(endBpm/startBpm);
+  return rampSeconds+(beat-rampBeats)*60/endBpm;
+ };
+ const events=target.events.map(event=>{
+  const beat=event.at*endBpm/60,endBeat=(event.at+event.duration)*endBpm/60;
+  const at=secondsAtBeat(beat),end=secondsAtBeat(endBeat);
+  return{...event,at,duration:Math.max(.035,end-at)};
+ });
+ const totalBeats=target.duration*endBpm/60;
  return{
   ...target,
   id:current.tune.id+'.'+mood+'.'+current.key,
-  bpm:current.bpm,
-  duration:current.duration,
+  duration:secondsAtBeat(totalBeats),
   events,
-  transitionSeconds:Math.min(current.duration,bars*current.tune.meter*60/current.bpm)
+  transitionSeconds:secondsAtBeat(Math.min(rampBeats,totalBeats))
  };
 }
