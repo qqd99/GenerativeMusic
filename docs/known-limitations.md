@@ -4,10 +4,10 @@
 
 - Standalone browser demo; no PixiJS app files are modified.
 - TypeScript composition, rotation scheduler and Web Audio playback are separate modules.
-- Twelve distinct carol melody records, four styles and five transposition offsets (240 virtual combinations).
+- Twelve distinct carol melody records, five styles and five transposition offsets (300 virtual combinations).
 - Seeded composer and seeded repertoire selection; injected clock for rotation and quiet-hour simulation.
 - A 72-hour simulated scheduler test checks the rolling 40-track no-repeat window without rendering or playing 72 hours of audio.
-- Quiet-hour rotation uses ballad/musicbox styles; configured timezone defaults to Asia/Ho_Chi_Minh.
+- Quiet-hour rotation uses ballad/musicbox/ambient styles; configured timezone defaults to Asia/Ho_Chi_Minh.
 - Dedication plays Silent Night and then resumes normal rotation without immediately selecting Silent Night again.
 - Playback accepts a supplied BaseAudioContext and output AudioNode; app master volume, mute and speech ducking remain outside the module.
 - Look-ahead scheduling uses AudioContext.currentTime; active musical voices are capped; stop cancels rotation/tick timers and stops scheduled sources.
