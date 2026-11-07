@@ -6,7 +6,7 @@ A standalone browser-based procedural Christmas music laboratory. Independent of
 
 https://qqd99.github.io/GenerativeMusic/
 
-If GitHub Pages has not been enabled yet, open **Settings → Pages → Build and deployment → GitHub Actions**. The Pages workflow builds the TypeScript modules and deploys the repository root.
+The Pages workflow builds the TypeScript modules and deploys only the static demo (`index.html` and `dist/`) to GitHub Pages.
 
 ## Features
 
