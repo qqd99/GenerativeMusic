@@ -1,4 +1,4 @@
-export {GenerativeMusic,defaultConfig,composeTrack,validateConfig,tunes} from './generative-music.js';
+export {GenerativeMusic,defaultConfig,composeTrack,composeMoodTransition,validateConfig,tunes} from './generative-music.js';
 export {RotationScheduler,systemClock} from './scheduler.js';
 export {virtualTrackIds,seeded,styles} from './composer.js';
 export type {Config,TrackPlan,Clock,NoteEvent} from './composer.js';
