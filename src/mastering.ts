@@ -60,7 +60,7 @@ export function applyGainDb(channels:readonly Float32Array[],gainDb:number):Floa
 }
 export function analyzeAndNormalize(channels:readonly Float32Array[],sampleRate:number,targetLufs=-22,maxTruePeakDbfs=-1):{channels:Float32Array[];report:LoudnessReport}{
  const integrated=integratedLufs(channels,sampleRate),peak=truePeakDbfs(channels);
- const gain=normalizationGainDb(channels,sampleRate,targetLufs,maxTruePeakDbfs);
+ const gain=Number.isFinite(integrated)&&Number.isFinite(peak)?Math.min(targetLufs-integrated,maxTruePeakDbfs-peak):0;
  const normalized=applyGainDb(channels,gain);
  return{channels:normalized,report:{integratedLufs:integrated,truePeakDbfs:peak,normalizationGainDb:gain,normalizedLufs:integrated+gain,normalizedTruePeakDbfs:peak+gain}};
 }
