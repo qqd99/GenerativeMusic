@@ -81,5 +81,5 @@ export function estimateTrackGainDb(plan:{duration:number;events:readonly {at:nu
  for(const change of changes){current+=change.delta;peak=Math.max(peak,current);}
  const peakDb=20*Math.log10(Math.max(1e-12,peak));
  const lufsGain=targetLufs-estimatedLufs,peakGain=maxTruePeakDbfs-peakDb;
- return Math.max(-18,Math.min(9,lufsGain,peakGain));
+ return Math.min(9,lufsGain,peakGain);
 }
