@@ -26,11 +26,11 @@ export function validateConfig(input:Partial<Config>={}):Config{
  return c;
 }
 export function seeded(seed:number){let x=seed>>>0;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
-export const styles:Style[]=['swing','ballad','musicbox','bellchoir'];
+export const styles:Style[]=['swing','ballad','musicbox','bellchoir','ambient'];
 const keyOffsets=[0,2,5,7,9];
 export function virtualTrackIds(catalog:Tune[]){return catalog.flatMap(t=>styles.flatMap(s=>keyOffsets.map(k=>t.id+'.'+s+'.'+((t.key+k)%12))));}
 export function composeTrack(tune:Tune,style:Style,key:number,seed:number,cfg:Config=defaultConfig):TrackPlan{
- const random=seeded(seed),range=style==='swing'?[112,140]:style==='ballad'?[66,76]:style==='musicbox'?[72,84]:[100,124];
+ const random=seeded(seed),range=style==='swing'?[112,140]:style==='ballad'?[66,76]:style==='musicbox'?[72,84]:style==='ambient'?[54,68]:[100,124];
  const bpm=Math.round(range[0]+random()*(range[1]-range[0])),beat=60/bpm,events:NoteEvent[]=[];
  const transpose=key-tune.key,bars=tune.melody.length*4;
  const add=(at:number,duration:number,midi:number,instrument:Instrument,gain:number,pan=0)=>{
@@ -41,12 +41,12 @@ export function composeTrack(tune:Tune,style:Style,key:number,seed:number,cfg:Co
   const phraseBar=bar%tune.melody.length,phrase=phraseBar===0||phraseBar===tune.melody.length-1;
   const lift=bar>=bars-8?2:0,root=48+tune.key+progression[bar%8]+transpose+lift;
   const chordThird=(tune.key===4||tune.key===9)?3:4;
-  add(bar*tune.meter*beat,2.4*beat,root-12,'bass',cfg.levels.bass,-.08);
+  add(bar*tune.meter*beat,(style==='ambient'?3.4:2.4)*beat,root-12,'bass',cfg.levels.bass*(style==='ambient'?.7:1),-.08);
   for(const [interval,pan] of [[chordThird,-.2],[7,.12],[12,.22]] as const)
-   add(bar*tune.meter*beat,tune.meter*.88*beat,root+interval+12,'strings',cfg.levels.strings,pan);
+   add(bar*tune.meter*beat,tune.meter*(style==='ambient'?1.8:.88)*beat,root+interval+12,'strings',cfg.levels.strings*(style==='ambient'?.75:1),pan);
   for(const [b,n,len] of tune.melody[phraseBar]){
    const swing=style==='swing'&&b%1===.5?.16:0,at=(bar*tune.meter+b+swing)*beat,pitch=n+transpose+lift;
-   const melodicInstrument=style==='musicbox'?'celesta':'piano';
+   const melodicInstrument=style==='musicbox'||style==='ambient'?'celesta':'piano';
    add(at,len*beat,pitch,melodicInstrument,cfg.levels.melody,.02);
    if((phrase&&b===0)||(style==='bellchoir'&&b%2===0)||(bar%4===3&&len>=1))
     add(at+.012,Math.min(.72,len)*beat,pitch+12,'bell',cfg.levels.bells,.25);
