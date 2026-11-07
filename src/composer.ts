@@ -52,7 +52,7 @@ export function composeTrack(tune:Tune,style:Style,key:number,seed:number,cfg:Co
    const swing=style==='swing'&&b%1===.5?.16:0,at=(bar*tune.meter+b+swing)*beat,pitch=n+transpose+lift;
    const melodicInstrument=style==='musicbox'||style==='ambient'?'celesta':'piano';
    add(at,len*beat,pitch,melodicInstrument,cfg.levels.melody,.02);
-   if((phrase&&b===0)||(style==='bellchoir'&&b%2===0)||(bar%4===3&&len>=1))
+   if((phrase&&b===0)||(style==='bellchoir'&&b%2===0)||(style==='swing'&&b%2===0)||(bar%4===3&&len>=1))
     add(at+.012,Math.min(.72,len)*beat,pitch+12,'bell',cfg.levels.bells,.25);
    if(style==='bellchoir'&&len>=1.5&&random()>.55)
     add(at+len*.52*beat,.18*beat,pitch+19,'bell',cfg.levels.bells*.35,-.3);
