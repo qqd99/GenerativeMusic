@@ -6,7 +6,7 @@ A standalone browser-based procedural Christmas music laboratory. Independent of
 
 https://qqd99.github.io/GenerativeMusic/
 
-The Pages workflow builds the TypeScript modules and deploys only the static demo (`index.html` and `dist/`) to GitHub Pages.
+The Pages workflow builds the TypeScript modules and deploys only the static demo (`index.html`, `demo.js` and `dist/`) to GitHub Pages.
 
 ## Features
 
@@ -43,6 +43,7 @@ The catalog now has 12 distinct melodies and 12 public-domain score references. 
 ## Project structure
 
 - `index.html` — browser audition page.
+- `demo.js` — browser controls, single-track WAV export and 12-track ZIP audition export.
 - `src/catalog.ts` — repertoire and score provenance.
 - `src/composer.ts` — pure seeded composer and config validation.
 - `src/scheduler.ts` — pure rotation scheduler with injectable clock.
@@ -50,6 +51,8 @@ The catalog now has 12 distinct melodies and 12 public-domain score references. 
 - `src/offline.ts` — OfflineAudioContext WAV renderer.
 - `src/mastering.ts` — loudness and true-peak estimates.
 - `tests/` — composer, scheduler, 72-hour simulation and mastering tests.
+- `config/default.json` — proposed validated defaults.
+- `docs/` — integration, score sources, licensing and acceptance records.
 
 
 Acceptance checklist: [docs/acceptance-status.md](docs/acceptance-status.md).
