@@ -44,12 +44,14 @@ The catalog now has 12 distinct melodies and 12 public-domain score references. 
 
 - `index.html` — browser audition page.
 - `demo.js` — browser controls, single-track WAV export and 12-track ZIP audition export.
+- `demo.js` — browser controls, single-track WAV export and 12-track ZIP audition export.
 - `src/catalog.ts` — repertoire and score provenance.
 - `src/composer.ts` — pure seeded composer and config validation.
 - `src/scheduler.ts` — pure rotation scheduler with injectable clock.
 - `src/generative-music.ts` — Web Audio playback engine.
 - `src/offline.ts` — OfflineAudioContext WAV renderer.
 - `src/mastering.ts` — loudness and true-peak estimates.
+- `src/zip.ts` — dependency-free ZIP writer for the audition pack.
 - `tests/` — composer, scheduler, 72-hour simulation and mastering tests.
 - `config/default.json` — proposed validated defaults.
 - `docs/` — integration, score sources, licensing and acceptance records.
