@@ -15,7 +15,7 @@ The Pages workflow builds the TypeScript modules and deploys only the static dem
 - Quiet-hour rotation (22:00–06:00, Asia/Ho_Chi_Minh by default).
 - Silent Night dedication followed by normal rotation.
 - Browser-native Web Audio synthesis; no third-party audio engine or downloaded sample packs.
-- OfflineAudioContext WAV export with K-weighted integrated-loudness estimation and 4× cubic true-peak estimation.
+- OfflineAudioContext WAV export with K-weighted integrated-loudness estimation and 4× cubic true-peak estimation; batch export creates a ZIP of 12 ambient audition WAV previews.
 - Pure 72-hour scheduler simulation and tests.
 - Standalone TypeScript module that accepts the host's BaseAudioContext and output AudioNode.
 
