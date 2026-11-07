@@ -158,6 +158,7 @@ export class GenerativeMusic {
      envelope.gain.linearRampToValueAtTime(.0001,stopAt+.035);
     }catch{}
     for(const source of sources)try{source.stop(stopAt+.04);}catch{}
+    if(ctx.state!=='running'){this.voices.delete(voice);for(const node of nodes)try{node.disconnect();}catch{}}
    }
   };
   this.voices.add(voice);
