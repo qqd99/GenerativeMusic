@@ -37,7 +37,7 @@ describe('Generative Music composer and scheduler',()=>{
   expect(new Set(tunes.map(t=>t.id)).size).toBe(12);
   for(const tune of tunes){expect(tune.source.startsWith('https://')).toBe(true);expect(tune.sourceNote.length).toBeGreaterThan(20);}
  });
- it('creates 240 distinct tune/style/key combinations',()=>{
+ it('creates 300 distinct tune/style/key combinations',()=>{
   const ids=virtualTrackIds(tunes);expect(ids).toHaveLength(300);expect(new Set(ids).size).toBe(300);
  });
  it('is deterministic for the same tune, configuration and seed',()=>{
@@ -65,7 +65,7 @@ describe('Generative Music composer and scheduler',()=>{
  it('reproduces the same 72-hour event sequence for the same seed',()=>{
   expect(run72(2026).played).toEqual(run72(2026).played);
  });
- it('restricts quiet-hour selections to ballad and musicbox styles',()=>{
+ it('restricts quiet-hour selections to quiet styles',()=>{
   const clock=new FakeClock(Date.UTC(2026,11,20,23)),styles:string[]=[];
   const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>styles.push(p.style)});
   scheduler.start();clock.advance(60*60*1000);
