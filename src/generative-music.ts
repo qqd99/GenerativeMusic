@@ -1,9 +1,9 @@
 import type {Clock,Config,TrackPlan,NoteEvent} from './composer.js';
-import {composeTrack,defaultConfig,validateConfig} from './composer.js';
+import {composeTrack,composeMoodTransition,defaultConfig,validateConfig} from './composer.js';
 import {RotationScheduler,systemClock} from './scheduler.js';
 import {tunes} from './catalog.js';
 import {estimateTrackGainDb} from './mastering.js';
-import type {Instrument,Style,Tune} from './types.js';
+import type {Instrument,Style,Tune,MusicMood} from './types.js';
 
 type Voice={nodes:AudioNode[];sources:AudioScheduledSourceNode[];startedAt:number;stop:(at:number)=>void};
 export type MusicOptions={
@@ -11,8 +11,8 @@ export type MusicOptions={
  onTrack?:(p:{id:string;title:string;style:Style;key:number;bpm:number})=>void;
  onStatus?:(message:string)=>void;
 };
-export {tunes,defaultConfig,composeTrack,validateConfig};
-export type {Config,TrackPlan,Clock,Style,Tune};
+export {tunes,defaultConfig,composeTrack,composeMoodTransition,validateConfig};
+export type {Config,TrackPlan,Clock,Style,Tune,MusicMood};
 
 export class GenerativeMusic {
  readonly config:Config;
@@ -61,12 +61,20 @@ export class GenerativeMusic {
   this.audition(plan);
  }
  audition(plan:TrackPlan){this.running=true;this.scheduler.dedication(plan);}
+ /** Crossfade the current carol into a new accompaniment over the requested number of bars. */
+ transitionTo(mood:MusicMood,bars=8):boolean{
+  if(!this.running||!this.plan)return false;
+  const next=composeMoodTransition(this.plan,mood,bars,this.config);
+  this.scheduler.transition(next);
+  return true;
+ }
  private playPlan(plan:TrackPlan){
   if(!this.running)return;
   const ctx=this.options.context,now=ctx.currentTime,fade=this.config.crossfadeSec;
   if(this.tickTimer!==undefined)this.clock.clearTimeout(this.tickTimer);
   this.tickTimer=undefined;
   const nextGain=ctx.createGain(),old=this.currentGain;
+  const fade=plan.transitionSeconds??this.config.crossfadeSec;
   nextGain.gain.setValueAtTime(.0001,now);
   const trackGainDb=estimateTrackGainDb(plan,this.config.targetLufs,this.config.maxTruePeakDbfs);
   const linearGain=Math.pow(10,trackGainDb/20);
