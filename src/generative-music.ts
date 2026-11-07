@@ -31,6 +31,8 @@ export class GenerativeMusic {
  private noiseBuffer?:AudioBuffer;
  private dedicationCount=0;
 
+ get isRunning(){return this.running;}
+
  constructor(private readonly options:MusicOptions){
   this.config=validateConfig(options.config);
   this.clock=options.clock??systemClock;
@@ -70,7 +72,7 @@ export class GenerativeMusic {
  }
  private playPlan(plan:TrackPlan){
   if(!this.running)return;
-  const ctx=this.options.context,now=ctx.currentTime,fade=this.config.crossfadeSec;
+  const ctx=this.options.context,now=ctx.currentTime;
   if(this.tickTimer!==undefined)this.clock.clearTimeout(this.tickTimer);
   this.tickTimer=undefined;
   const nextGain=ctx.createGain(),old=this.currentGain;
