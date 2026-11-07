@@ -110,3 +110,10 @@ it('estimates a bounded live music gain before the app master bus',()=>{
  expect(Number.isFinite(gain)).toBe(true);
  expect(gain).toBeLessThanOrEqual(9);
 });
+
+it('makes repeated start and stop calls safe',()=>{
+ const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
+ const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>played.push(p)});
+ scheduler.start();scheduler.start();expect(played).toHaveLength(1);expect(clock.pending).toBe(1);
+ scheduler.stop();scheduler.stop();expect(clock.pending).toBe(0);
+});
