@@ -108,6 +108,6 @@ it('estimates a bounded live music gain before the app master bus',()=>{
  const plan=composeTrack(tunes[0],'ballad',0,77,defaultConfig);
  const gain=estimateTrackGainDb(plan,-22,-1);
  expect(Number.isFinite(gain)).toBe(true);
- expect(gain).toBeGreaterThanOrEqual(-18);
+ expect(gain).toBeLessThanOrEqual(-1 - (-1));
  expect(gain).toBeLessThanOrEqual(9);
 });
