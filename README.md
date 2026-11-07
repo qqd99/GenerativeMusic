@@ -50,3 +50,6 @@ The catalog now has 12 distinct melodies and 12 public-domain score references. 
 - `src/offline.ts` — OfflineAudioContext WAV renderer.
 - `src/mastering.ts` — loudness and true-peak estimates.
 - `tests/` — composer, scheduler, 72-hour simulation and mastering tests.
+
+
+Acceptance checklist: [docs/acceptance-status.md](docs/acceptance-status.md).
