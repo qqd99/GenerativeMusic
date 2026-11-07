@@ -24,7 +24,7 @@
 - **Suspended tabs / delayed timers:** the live look-ahead scheduler only schedules a bounded future window. If a tab is suspended long enough to miss note events, those stale events are skipped rather than replayed as a burst; rotation continues when its delayed timer is allowed to run again. Browser/OS behavior still needs target-device testing.
 - **72-hour simulation:** this is a fast scheduler-only test. It does not play audio for 72 hours and does not validate browser throttling, device sleep or OS audio behavior.
 - **Operational soak:** owner listening sign-off, OBS CPU/GPU measurements, browser/device compatibility and a 24-hour real-time soak remain outstanding.
-- **WAV audition artifacts:** WAVs are generated on demand by the browser OfflineAudioContext renderer; the repository does not commit large generated binary WAVs.
+- **WAV audition artifacts:** the browser can render one full selected track or batch-render 12 shorter ambient WAV previews into a ZIP. These are generated on demand; large binary WAVs are not committed to Git.
 
 ## Dependencies
 
