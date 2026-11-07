@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p site
           cp index.html site/index.html
+          cp demo.js site/demo.js
           cp -R dist site/dist
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
