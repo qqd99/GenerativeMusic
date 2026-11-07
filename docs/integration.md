@@ -19,11 +19,15 @@ const music = new GenerativeMusic({
 // The app decides when to call these, e.g. after its own user gesture.
 music.start();
 music.dedication(); // Silent Night, then normal rotation
+music.transitionTo('exciting', 8); // 8-bar same-song emotional transition
+music.transitionTo('calm', 8); // transition back to calm
 music.stop();
 music.dispose(); // when the owning app permanently tears down this module
 ```
 
-The module does not create an AudioContext, call resume/suspend/close, set master volume, change mute, duck for speech, play gift sounds, or connect to `context.destination`. Every live musical voice routes through the supplied `output` AudioNode.
+The module does not create an AudioContext, call resume/suspend/close, set master volume, change mute, duck for speech, play gift sounds, or connect to `context.destination`.
+
+Mood transitions preserve the current carol, key and tempo. The accompaniment is recomposed deterministically and crossfaded over the requested number of bars. Supported moods are `calm` (ambient accompaniment) and `exciting` (festive swing accompaniment); valid transition lengths are 1–32 bars. Every live musical voice routes through the supplied `output` AudioNode.
 
 ## Host-side responsibilities
 
