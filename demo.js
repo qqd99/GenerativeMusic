@@ -1,8 +1,7 @@
 
-import {GenerativeMusic,tunes,composeTrack,defaultConfig,renderTrackOffline} from './dist/index.js';
+import {GenerativeMusic,tunes,composeTrack,defaultConfig,renderTrackOffline,zipStore} from './dist/index.js';
 const $=id=>document.getElementById(id),status=$('status'),renderStatus=$('render-status');
 let context=null,master=null,player=null;
-const styles=['Festive swing','Gentle ballad','Music box lullaby','Winter bell choir'];
 for(const tune of tunes){const option=document.createElement('option');option.value=tune.id;option.textContent=tune.title;$('tune').append(option);
  const card=document.createElement('div');card.className='song';
  const name=document.createElement('strong');name.textContent=tune.title;
@@ -35,25 +34,6 @@ $('render').onclick=async()=>{
  }catch(e){renderStatus.textContent='WAV render failed: '+e.message;}finally{button.disabled=false;}
 };
 
-function crc32(bytes){let crc=0xffffffff;for(const b of bytes){crc^=b;for(let k=0;k<8;k++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);}return(crc^0xffffffff)>>>0;}
-function zipStore(files){
- const encoder=new TextEncoder(),locals=[],centrals=[];let offset=0;
- for(const file of files){
-  const name=encoder.encode(file.name),data=file.data,crc=crc32(data);
-  const local=new ArrayBuffer(30),lv=new DataView(local);
-  lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0,true);lv.setUint16(8,0,true);
-  lv.setUint16(10,0,true);lv.setUint16(12,0x0021,true);lv.setUint32(14,crc,true);lv.setUint32(18,data.length,true);lv.setUint32(22,data.length,true);lv.setUint16(26,name.length,true);lv.setUint16(28,0,true);
-  locals.push(local,name,data);
-  const central=new ArrayBuffer(46),cv=new DataView(central);
-  cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0,true);cv.setUint16(10,0,true);
-  cv.setUint16(12,0,true);cv.setUint16(14,0x0021,true);cv.setUint32(16,crc,true);cv.setUint32(20,data.length,true);cv.setUint32(24,data.length,true);
-  cv.setUint16(28,name.length,true);cv.setUint16(30,0,true);cv.setUint16(32,0,true);cv.setUint16(34,0,true);cv.setUint16(36,0,true);cv.setUint32(38,0,true);cv.setUint32(42,offset,true);
-  centrals.push(central,name);offset+=30+name.length+data.length;
- }
- const centralSize=centrals.reduce((n,x)=>n+x.byteLength,0),end=new ArrayBuffer(22),ev=new DataView(end);
- ev.setUint32(0,0x06054b50,true);ev.setUint16(4,0,true);ev.setUint16(6,0,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,centralSize,true);ev.setUint32(16,offset,true);ev.setUint16(20,0,true);
- return new Blob([...locals,...centrals,end],{type:'application/zip'});
-}
 function slug(value){return value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 $('render-all').onclick=async()=>{
  const button=$('render-all'),files=[],seed=Number($('seed').value);
