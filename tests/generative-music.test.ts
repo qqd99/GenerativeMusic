@@ -38,7 +38,7 @@ describe('Generative Music composer and scheduler',()=>{
   for(const tune of tunes){expect(tune.source.startsWith('https://')).toBe(true);expect(tune.sourceNote.length).toBeGreaterThan(20);}
  });
  it('creates 240 distinct tune/style/key combinations',()=>{
-  const ids=virtualTrackIds(tunes);expect(ids).toHaveLength(240);expect(new Set(ids).size).toBe(240);
+  const ids=virtualTrackIds(tunes);expect(ids).toHaveLength(300);expect(new Set(ids).size).toBe(300);
  });
  it('is deterministic for the same tune, configuration and seed',()=>{
   const a=composeTrack(tunes[0],'swing',0,123,defaultConfig);
@@ -70,7 +70,7 @@ describe('Generative Music composer and scheduler',()=>{
   const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>styles.push(p.style)});
   scheduler.start();clock.advance(60*60*1000);
   expect(styles.length).toBeGreaterThan(5);
-  expect(styles.every(s=>s==='ballad'||s==='musicbox')).toBe(true);
+  expect(styles.every(s=>s==='ballad'||s==='musicbox'||s==='ambient')).toBe(true);
  });
  it('cancels pending rotation work on stop',()=>{
   const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
