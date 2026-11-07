@@ -1,6 +1,6 @@
 import type {Clock,Config,TrackPlan} from './composer.js';
 import type {Tune,Style} from './types.js';
-import {composeTrack,defaultConfig,seeded,styles,validateConfig} from './composer.js';
+import {composeTrack,seeded,styles,validateConfig} from './composer.js';
 
 export type SchedulerClock=Clock;
 export const systemClock:SchedulerClock={
@@ -34,7 +34,7 @@ export class RotationScheduler {
  stop(){
   this.running=false;this.token++;
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
-  this.timer=undefined;this.active=undefined;
+  this.timer=undefined;this.active=undefined;this.skipTuneId=undefined;
  }
  dedication(plan:TrackPlan){
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
