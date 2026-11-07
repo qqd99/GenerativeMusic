@@ -139,7 +139,8 @@ describe('emotional mood transitions',()=>{
   expect(a.key).toBe(base.key);
   expect(a.style).toBe('swing');
   expect(a.bpm).toBeGreaterThan(base.bpm);
-  expect(a.transitionSeconds).toBeGreaterThan(0);\n  expect(a.transitionSeconds).toBeLessThan(a.duration);
+  expect(a.transitionSeconds).toBeGreaterThan(0);
+  expect(a.transitionSeconds).toBeLessThan(a.duration);
   expect(a.events.length).toBeGreaterThan(base.events.length);
  });
  it('supports the reverse exciting-to-calm transition',()=>{
@@ -149,7 +150,8 @@ describe('emotional mood transitions',()=>{
   expect(next.tune.id).toBe(base.tune.id);
   expect(next.key).toBe(base.key);
   expect(next.bpm).toBeLessThan(base.bpm);
-  expect(next.transitionSeconds).toBeGreaterThan(0);\n  expect(next.transitionSeconds).toBeLessThan(next.duration);
+  expect(next.transitionSeconds).toBeGreaterThan(0);
+  expect(next.transitionSeconds).toBeLessThan(next.duration);
  });
  it('routes a live mood transition through the scheduler without duplicating rotation timers',()=>{
   const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
