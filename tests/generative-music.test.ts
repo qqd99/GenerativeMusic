@@ -151,6 +151,18 @@ describe('emotional mood transitions',()=>{
   expect(next.bpm).toBe(base.bpm);
   expect(next.transitionSeconds).toBeCloseTo(4*base.tune.meter*60/base.bpm);
  });
+ it('routes a live mood transition through the scheduler without duplicating rotation timers',()=>{
+  const clock=new FakeClock(Date.UTC(2026,11,20,12)),played:TrackPlan[]=[];
+  const scheduler=new RotationScheduler({catalog:tunes,config:cfg(),clock,onTrack:p=>played.push(p)});
+  scheduler.start();
+  const before=played.length,calm=composeTrack(tunes[0],'ambient',tunes[0].key,88,defaultConfig);
+  const exciting=composeMoodTransition(calm,'exciting',8,defaultConfig);
+  scheduler.transition(exciting);
+  expect(played).toHaveLength(before+1);
+  expect(scheduler.currentTrack?.style).toBe('swing');
+  expect(clock.pending).toBe(1);
+  scheduler.stop();expect(clock.pending).toBe(0);
+ });
  it('rejects invalid transition lengths',()=>{
   const base=composeTrack(tunes[0],'ambient',0,2026,defaultConfig);
   expect(()=>composeMoodTransition(base,'exciting',0)).toThrow();
