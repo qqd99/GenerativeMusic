@@ -21,7 +21,24 @@ function ensurePlayer(){
 }
 $('start').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.start();}catch(e){status.textContent='Unable to start: '+e.message;}};
 $('dedication').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.dedication();}catch(e){status.textContent='Unable to play dedication: '+e.message;}};
-$('stop').onclick=()=>{player?.stop();status.textContent='Stopped.';};
+$('stop').onclick=()=>{player?.stop();status.textContent='Stopped.';$('mood-status').textContent='Playback stopped. Start again before changing mood.';};
+
+async function changeMood(mood){
+ const label=mood==='calm'?'Calm / emotional':'Exciting / festive';
+ try{
+  const p=ensurePlayer();
+  if(context.state==='suspended')await context.resume();
+  if(!p.isRunning)p.start();
+  const bars=Number($('transition-bars').value);
+  if(!p.transitionTo(mood,bars))throw new Error('Start playback before changing mood.');
+  $('mood-status').textContent='Transitioning to '+label+' over '+bars+' bars. The carol and key stay the same.';
+  $('mood-calm').classList.toggle('primary',mood==='calm');
+  $('mood-exciting').classList.toggle('primary',mood==='exciting');
+ }catch(error){$('mood-status').textContent='Mood transition unavailable: '+error.message;}
+}
+$('mood-calm').onclick=()=>changeMood('calm');
+$('mood-exciting').onclick=()=>changeMood('exciting');
+
 $('volume').oninput=()=>{if(master&&context)master.gain.setTargetAtTime(Number($('volume').value),context.currentTime,.025);};
 $('play-selected').onclick=async()=>{try{const p=ensurePlayer();if(context.state==='suspended')await context.resume();p.audition(selectedPlan());}catch(e){renderStatus.textContent='Unable to audition: '+e.message;}};
 $('render').onclick=async()=>{
