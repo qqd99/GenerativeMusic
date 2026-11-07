@@ -36,6 +36,10 @@ export class RotationScheduler {
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
   this.timer=undefined;this.active=undefined;this.skipTuneId=undefined;
  }
+ transition(plan:TrackPlan){
+  if(!this.running)throw new Error('Start the music before requesting a mood transition');
+  this.playAndSchedule(plan);
+ }
  dedication(plan:TrackPlan){
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
   this.running=true;this.token++;this.skipTuneId=plan.tune.id;this.history.push(plan.id);if(this.history.length>this.config.noRepeatWindow)this.history.shift();this.playAndSchedule(plan,()=>this.nextTrack());
@@ -69,9 +73,11 @@ export class RotationScheduler {
  private playAndSchedule(plan:TrackPlan,done:()=>void){
   if(!this.running)return;
   this.active=plan;
+  if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
   const token=++this.token;
   this.options.onTrack(plan);
-  const wait=Math.max(1000,(plan.duration-this.config.crossfadeSec)*1000);
+  const fade=plan.transitionSeconds??this.config.crossfadeSec;
+  const wait=Math.max(1000,(plan.duration-fade)*1000);
   this.timer=this.clock.setTimeout(()=>{if(this.running&&token===this.token)done();},wait);
  }
 }
