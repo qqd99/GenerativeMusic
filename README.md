@@ -11,7 +11,7 @@ The Pages workflow builds the TypeScript modules and deploys only the static dem
 ## Features
 
 - Twelve Christmas carol melody records; five arrangement styles (swing, ballad, musicbox, bellchoir, ambient); five key offsets (300 virtual combinations).
-- Bidirectional calm ↔ exciting mood transitions that preserve the carol, key and tempo while crossfading accompaniment over 4, 8 or 16 bars.
+- Bidirectional calm ↔ exciting mood transitions that preserve the carol and key while smoothly ramping tempo and crossfading accompaniment over 4, 8 or 16 bars.
 - Seeded composition and deterministic rotation selection.
 - Quiet-hour rotation (22:00–06:00, Asia/Ho_Chi_Minh by default).
 - Silent Night dedication followed by normal rotation.
