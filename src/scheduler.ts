@@ -76,8 +76,7 @@ export class RotationScheduler {
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
   const token=++this.token;
   this.options.onTrack(plan);
-  const fade=plan.transitionSeconds??this.config.crossfadeSec;
-  const wait=Math.max(1000,(plan.duration-fade)*1000);
+  const wait=Math.max(1000,(plan.duration-this.config.crossfadeSec)*1000);
   this.timer=this.clock.setTimeout(()=>{if(this.running&&token===this.token)done();},wait);
  }
 }
