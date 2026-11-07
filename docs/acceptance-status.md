@@ -16,7 +16,7 @@ This checklist maps only the requirements present in the supplied music brief. I
 | Bounded active voices and look-ahead | Implemented | Voice cap and configurable 1.25-second look-ahead default |
 | Sample cache below 150 MB | Implemented by omission | No decoded sample assets or sample cache; procedural noise only |
 | Smooth transitions and node cleanup | Implemented in engine | Crossfade, scheduled stop, onended cleanup; real device soak still needed |
-| Quiet-hour behavior | Implemented | Ballad/musicbox during configured 22:00–06:00 local time |
+| Quiet-hour behavior | Implemented | Ballad/musicbox/ambient during configured 22:00–06:00 local time |
 | Dedication support | Implemented | Silent Night dedication, then normal rotation; skips that tune on immediate next pick |
 | Twelve public-domain/PD score source records | Recorded | See `docs/tunes.md`; sources identify scores as public domain |
 | Twelve note-for-note verified melody transcriptions | **Pending** | Every hand-entered melody still needs a score-by-score pitch/rhythm audit and human sign-off |
