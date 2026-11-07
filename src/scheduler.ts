@@ -38,7 +38,7 @@ export class RotationScheduler {
  }
  transition(plan:TrackPlan){
   if(!this.running)throw new Error('Start the music before requesting a mood transition');
-  this.playAndSchedule(plan);
+  this.playAndSchedule(plan,()=>this.nextTrack());
  }
  dedication(plan:TrackPlan){
   if(this.timer!==undefined)this.clock.clearTimeout(this.timer);
