@@ -1,1 +1,22 @@
-{"name":"generativemusic","version":"1.0.0","private":true,"type":"module","scripts":{"build":"tsc -p tsconfig.build.json","typecheck":"tsc --noEmit","test":"vitest run --config vitest.config.ts"},"devDependencies":{"typescript":"~5.9.3","vitest":"^3.2.4"}}
+{
+  "name": "generativemusic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
