@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {composeTrack,defaultConfig,validateConfig,virtualTrackIds} from '../src/composer';
+import {composeTrack,composeMoodTransition,defaultConfig,validateConfig,virtualTrackIds} from '../src/composer';
 import {tunes} from '../src/catalog';
 import {RotationScheduler} from '../src/scheduler';
 import type {Clock,Config,TrackPlan} from '../src/composer';
@@ -127,4 +127,33 @@ it('creates a valid uncompressed ZIP for the audition WAV pack',async()=>{
  expect(view.getUint32(14,true)).toBe(0x352441c2);
  expect(view.getUint32(bytes.length-22,true)).toBe(0x06054b50);
  expect(view.getUint16(bytes.length-12,true)).toBe(1);
+});
+
+describe('emotional mood transitions',()=>{
+ it('creates deterministic calm and exciting versions of the same tune and key',()=>{
+  const base=composeTrack(tunes[0],'ambient',0,2026,defaultConfig);
+  const a=composeMoodTransition(base,'exciting',8,defaultConfig);
+  const b=composeMoodTransition(base,'exciting',8,defaultConfig);
+  expect(a).toEqual(b);
+  expect(a.tune.id).toBe(base.tune.id);
+  expect(a.key).toBe(base.key);
+  expect(a.style).toBe('swing');
+  expect(a.bpm).toBe(base.bpm);
+  expect(a.transitionSeconds).toBeCloseTo(8*base.tune.meter*60/base.bpm);
+  expect(a.events.length).toBeGreaterThan(base.events.length);
+ });
+ it('supports the reverse exciting-to-calm transition',()=>{
+  const base=composeTrack(tunes[0],'swing',0,2026,defaultConfig);
+  const next=composeMoodTransition(base,'calm',4,defaultConfig);
+  expect(next.style).toBe('ambient');
+  expect(next.tune.id).toBe(base.tune.id);
+  expect(next.key).toBe(base.key);
+  expect(next.bpm).toBe(base.bpm);
+  expect(next.transitionSeconds).toBeCloseTo(4*base.tune.meter*60/base.bpm);
+ });
+ it('rejects invalid transition lengths',()=>{
+  const base=composeTrack(tunes[0],'ambient',0,2026,defaultConfig);
+  expect(()=>composeMoodTransition(base,'exciting',0)).toThrow();
+  expect(()=>composeMoodTransition(base,'calm',33)).toThrow();
+ });
 });
